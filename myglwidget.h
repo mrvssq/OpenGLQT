@@ -15,13 +15,14 @@ public:
     void setRadius(double r1, double r2, double r3);
     void setUV(double FromU, double BeforeU, double FromV, double BeforeV);
 
-    void setDisplayType(int modeType);
     void setColorWall(int r, int g, int b);
-    void setThickLinePoint(float thick);
+    void setThickLinePoint(int thick);
     void setChooseFigure(int item);
 
-    void addCountLongitude(double longCount);
-    void addCountLatitude(double latCount);
+    void setCountVer(int verCount);
+    void setCountHor(int horCount);
+    void setShowVer(bool show);
+    void setShowHor(bool show);
 
     void plastScale();
     void minusScale();
@@ -51,8 +52,6 @@ signals:
 
 
 private:
-    //void drawPiramid();
-    //void drawEllipsoid();
     void draw();
     double* getCoordinatesParametricFunc(double param[], double v, double u);
     void drowFun(double argsFun[], double uGap[], double vGap[]);
@@ -63,8 +62,6 @@ private:
 
     GLfloat thickLinesPoints = 1.0;
 
-    //double longitude = 30.0;
-    //double latitude = 30.0;
     double argFun1 = 3.0;
     double argFun2 = 3.0;
     double argFun3 = 3.0;
@@ -75,10 +72,14 @@ private:
 
     double vFrom = -M_PI_2;
     double vBefore = M_PI_2;
-    double vStep = 0.2;
     double uFrom = 0;
     double uBefore = 2*M_PI;
-    double uStep = 0.2;
+
+    bool showHor = true;
+    bool showVer = true;
+
+    int vCount = 10;
+    int hCount = 20;
 
     int itemFigure=0;
 

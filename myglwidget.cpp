@@ -82,7 +82,6 @@ void MyGLWidget::paintGL(){
     glScalef(xScale, yScale, zScale);
 
     draw();
-    //drawPiramid();
 }
 
 void MyGLWidget::resizeGL(int width, int height){
@@ -138,57 +137,29 @@ void MyGLWidget::setUV(double FromU, double BeforeU, double FromV, double Before
     updateGL();
 }
 
-void MyGLWidget::addCountLongitude(double longCount){
-    if (longCount > 0){
-        vStep -= longCount;
-    }
-    else {
-        vStep -= longCount;
-    }
+void MyGLWidget::setCountVer(int verCount){
+    vCount = verCount;
     updateGL();
 }
 
-void MyGLWidget::addCountLatitude(double latCount){
-    if (latCount > 0){
-        uStep -= latCount;
-    }
-    else {
-        uStep -= latCount;
-    }
+void MyGLWidget::setCountHor(int horCount){
+    hCount = horCount;
     updateGL();
 }
 
-void MyGLWidget::setDisplayType(int modeType){
-
-    switch (modeType) {
-    case 0:
-        glDisable(GL_LINE_STIPPLE);
-        vStep = 0.2;
-        uStep = 0.2;
-        thickLinesPoints = 1;
-      break;
-    case 1:
-        glEnable(GL_LINE_STIPPLE);
-        glLineStipple(1, 0x0101);
-        vStep = 0.2;
-        uStep = 0.2;
-        thickLinesPoints = 1;
-      break;
-    case 2:
-        glDisable(GL_LINE_STIPPLE);
-        vStep = 0.01;
-        uStep = 0.01;
-        thickLinesPoints = 6;
-      break;
-    default:
-        break;
-    }
-
+void MyGLWidget::setThickLinePoint(int thick){
+    float linethik = thick * 0.4f;
+    thickLinesPoints = linethik;
     updateGL();
 }
 
-void MyGLWidget::setThickLinePoint(float thick){
-    thickLinesPoints = thick;
+void MyGLWidget::setShowHor(bool show){
+    showHor = show;
+    updateGL();
+}
+
+void MyGLWidget::setShowVer(bool show){
+    showVer = show;
     updateGL();
 }
 
@@ -280,40 +251,48 @@ double* MyGLWidget::getCoordinatesParametricFunc(double param[], double v, doubl
 void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[]){
     double *xyzFun = new double[3];
 
-    for (double u = uGap[0]; u <= uGap[1]; u+=uGap[2]){ //кол-во колец
-        glBegin(GL_LINE_STRIP);
-        for(double v = vGap[0]; v <= vGap[1]; v+=0.01) //расстояние между точками
-        {
-          xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+    if (showVer){
+        double stepVer = fabs(vGap[0] - vGap[1]) / (vCount);
 
-          glVertex3d(xyzFun[0],
-                    xyzFun[1],
-                    xyzFun[2]);
-          delete[] xyzFun;
+        for (double u = uGap[0]; u <= uGap[1]; u+=stepVer){ //кол-во колец Вертикаль
+            glBegin(GL_LINE_STRIP);
+            for(double v = vGap[0]; v <= vGap[1]; v+=0.01) //расстояние между точками
+            {
+              xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+
+              glVertex3d(xyzFun[0],
+                        xyzFun[1],
+                        xyzFun[2]);
+              delete[] xyzFun;
+            }
+            glEnd();
         }
-        glEnd();
     }
 
-    for (double v = vGap[0]; v <= vGap[1]; v+=vGap[2]){ //кол-во колец
-        glBegin(GL_LINE_STRIP);
-        for(double u = uGap[0]; u <= uGap[1]; u+=0.01) //расстояние между точками
-        {
-          xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+    if (showHor){
+        double stepHor = fabs(uGap[0] - uGap[1]) / (hCount + 1);
 
-          glVertex3d(xyzFun[0],
-                    xyzFun[1],
-                    xyzFun[2]);
-          delete[] xyzFun;
+        for (double v = vGap[0]; v <= vGap[1]; v+=stepHor){ //кол-во колец Горизонталь
+            glBegin(GL_LINE_STRIP);
+            for(double u = uGap[0]; u <= uGap[1]; u+=0.01) //расстояние между точками
+            {
+              xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+
+              glVertex3d(xyzFun[0],
+                        xyzFun[1],
+                        xyzFun[2]);
+              delete[] xyzFun;
+            }
+            glEnd();
         }
-        glEnd();
     }
 
 }
 
 void MyGLWidget::draw(){
     double argsFun[3]={argFun1, argFun2, argFun3};
-    double vGap[3]={vFrom, vBefore, vStep};
-    double uGap[3]={uFrom, uBefore, uStep};
+    double vGap[3]={vFrom, vBefore};
+    double uGap[3]={uFrom, uBefore};
 
     glLineWidth(thickLinesPoints);
 

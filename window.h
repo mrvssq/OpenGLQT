@@ -22,21 +22,18 @@ private slots:
     void ButtonMinus();
     void ButtonSetRadius();
     void ButtonStopTimerRotate();
-    void ButtonUpLatitude();
-    void ButtonDownLatitude();
-    void ButtonUpLongitude();
-    void ButtonDownLongitude();
+    void ButtonUpVer();
+    void ButtonDownVer();
+    void ButtonUpHor();
+    void ButtonDownHor();
     void setThickLinePoint(int thick);
+    void setShowHor(bool show);
+    void setShowVer(bool show);
 
     void setTimerSpeed(int speed);
     void slotTimerRotate();
 
     void getTChooseFigure(int item);
-
-    void on_radioButtonFrame_clicked();
-    void on_radioButtonPoints_clicked();
-
-    void on_radioButtonSerface_clicked();
 
     void setParam1(int a);
     void setParam2(int b);
