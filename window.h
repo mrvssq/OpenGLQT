@@ -17,7 +17,7 @@ class Window : public QWidget
     Q_OBJECT
 
 private slots:
-    void ButtonSetColorWall();
+    void ButtonsetColor();
     void ButtonPlast();
     void ButtonMinus();
     void ButtonSetRadius();
@@ -33,11 +33,17 @@ private slots:
     void setTimerSpeed(int speed);
     void slotTimerRotate();
 
-    void getTChooseFigure(int item);
+    void setTChooseFigure(int item);
 
     void setParam1(int a);
     void setParam2(int b);
     void setParam3(int c);
+
+    void scrollXRotation(int angle);
+    void scrollYRotation(int angle);
+    void scrollZRotation(int angle);
+
+    void resizeEvent(QResizeEvent *event);
 
 public:
     explicit Window(QWidget *parent = 0);

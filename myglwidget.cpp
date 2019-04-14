@@ -13,53 +13,61 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     zRot = 0;
 }
 
-MyGLWidget::~MyGLWidget(){
+MyGLWidget::~MyGLWidget()
+{
 }
 
-QSize MyGLWidget::minimumSizeHint() const{
+QSize MyGLWidget::minimumSizeHint() const
+{
     return QSize(50, 50);
 }
 
-QSize MyGLWidget::sizeHint() const{
+QSize MyGLWidget::sizeHint() const
+{
     return QSize(800, 800);
 }
 
-static void qNormalizeAngle(int &angle){
+static void qNormalizeAngle(int &angle)
+{
     while (angle < 0)
         angle += 360 * 16;
     while (angle > 360)
         angle -= 360 * 16;
 }
 
-void MyGLWidget::setXRotation(int angle){
+void MyGLWidget::setXRotation(int angle)
+{
     qNormalizeAngle(angle);
-    if (angle != xRot) {
+    if (angle != xRot)
+    {
         xRot = angle;
-        emit xRotationChanged(angle);
         updateGL();
     }
 }
 
-void MyGLWidget::setYRotation(int angle){
+void MyGLWidget::setYRotation(int angle)
+{
     qNormalizeAngle(angle);
-    if (angle != yRot) {
+    if (angle != yRot)
+    {
         yRot = angle;
-        emit yRotationChanged(angle);
         updateGL();
     }
 }
 
-void MyGLWidget::setZRotation(int angle){
+void MyGLWidget::setZRotation(int angle)
+{
     qNormalizeAngle(angle);
-    if (angle != zRot) {
+    if (angle != zRot)
+    {
         zRot = angle;
-        emit zRotationChanged(angle);
         updateGL();
     }
 }
 
-void MyGLWidget::initializeGL(){
-    qglClearColor(QColor(95,169,169,0));
+void MyGLWidget::initializeGL()
+{
+    qglClearColor(QColor(95, 169, 169));
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -72,44 +80,50 @@ void MyGLWidget::initializeGL(){
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 }
 
-void MyGLWidget::paintGL(){
+void MyGLWidget::paintGL()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, -10.0);
     glRotatef(xRot / 1.0f, 1.0f, 0.0f, 0.0f);
     glRotatef(yRot / 1.0f, 0.0f, 1.0f, 0.0f);
     glRotatef(zRot / 1.0f, 0.0f, 0.0f, 1.0f);
     glScalef(xScale, yScale, zScale);
-
     draw();
 }
 
-void MyGLWidget::resizeGL(int width, int height){
-    int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
-
+void MyGLWidget::resizeGL(int width, int height)
+{
+    GLdouble ratio = width/static_cast<GLdouble>(height);
+    glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-#ifdef QT_OPENGL_ES_1
-    glOrthof(-2, +2, -2, +2, 1.0, 15.0);
-#else
-    glOrtho(-2, +2, -2, +2, 1.0, 15.0);
-#endif
+    #ifdef QT_OPENGL_ES_11
+        glOrthof(-2 * ratio, 2 * ratio, -2, 2, 1.0, 15.0);
+    #else
+        glOrtho(-2 * ratio, 2 * ratio, -2, 2, 1.0, 15.0);
+    #endif
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MyGLWidget::mousePressEvent(QMouseEvent *event){
+void MyGLWidget::mousePressEvent(QMouseEvent *event)
+{
     lastPos = event->pos();
 }
 
-void MyGLWidget::mouseMoveEvent(QMouseEvent *event){
+void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
 
-    if (event->buttons() & Qt::LeftButton) {
+    if (event->buttons() & Qt::LeftButton)
+    {
         setXRotation(xRot + 8 * dy);
         setYRotation(yRot + 8 * dx);
-    } else if (event->buttons() & Qt::RightButton) {
+    }
+    else if (event->buttons() & Qt::RightButton)
+    {
         setXRotation(xRot + 8 * dy);
         setZRotation(zRot + 8 * dx);
     }
@@ -117,89 +131,128 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event){
     lastPos = event->pos();
 }
 
-void MyGLWidget::setColorWall(int r, int g, int b){
-    qglClearColor(QColor(r,g,b,0));
+void MyGLWidget::setColorWall(QColor color)
+{
+    colorWall = color;
+    qglClearColor(color);
     updateGL();
 }
 
-void MyGLWidget::setRadius(double r1, double r2, double r3){
+void MyGLWidget::setRadius(double r1, double r2, double r3)
+{
     argFun1 = r1;
     argFun2 = r2;
     argFun3 = r3;
     updateGL();
 }
 
-void MyGLWidget::setUV(double FromU, double BeforeU, double FromV, double BeforeV){
-    uFrom = FromU;
-    uBefore = BeforeU;
-    vFrom = FromV;
-    vBefore = BeforeV;
+void MyGLWidget::setUV(double fromU, double beforeU, double fromV, double beforeV)
+{
+    uFrom = fromU;
+    uBefore = beforeU;
+    vFrom = fromV;
+    vBefore = beforeV;
     updateGL();
 }
 
-void MyGLWidget::setCountVer(int verCount){
+void MyGLWidget::setCountVer(int verCount)
+{
     vCount = verCount;
     updateGL();
 }
 
-void MyGLWidget::setCountHor(int horCount){
+void MyGLWidget::setCountHor(int horCount)
+{
     hCount = horCount;
     updateGL();
 }
 
-void MyGLWidget::setThickLinePoint(int thick){
+void MyGLWidget::setThickLinePoint(int thick)
+{
     float linethik = thick * 0.4f;
     thickLinesPoints = linethik;
     updateGL();
 }
 
-void MyGLWidget::setShowHor(bool show){
+void MyGLWidget::setShowHor(bool show)
+{
     showHor = show;
     updateGL();
 }
 
-void MyGLWidget::setShowVer(bool show){
+void MyGLWidget::setShowVer(bool show)
+{
     showVer = show;
     updateGL();
 }
 
-void MyGLWidget::plastScale(){
+void MyGLWidget::plastScale()
+{
     xScale+=0.1f;
     yScale+=0.1f;
     zScale+=0.1f;
     updateGL();
 }
 
-void MyGLWidget::minusScale(){
+void MyGLWidget::minusScale()
+{
     xScale-=0.1f;
     yScale-=0.1f;
     zScale-=0.1f;
     updateGL();
 }
 
-void MyGLWidget::rotation(bool side){
-
+void MyGLWidget::rotation(bool side, int asix)
+{
     int angle;
+    switch (asix)
+    {
+        case 0://xRot
+            if (side) angle = xRot + 1; else angle = xRot - 1;
 
-    if (side) angle = zRot + 1; else angle = zRot - 1;
+            qNormalizeAngle(angle);
+            if (angle != xRot)
+            {
+                xRot = angle;
+                updateGL();
+            }
+          break;
+        case 1://yRot
 
-    qNormalizeAngle(angle);
-    if (angle != zRot) {
-        zRot = angle;
-        emit zRotationChanged(angle);
-        updateGL();
+            if (side) angle = yRot + 1; else angle = yRot - 1;
+
+            qNormalizeAngle(angle);
+            if (angle != yRot)
+            {
+                yRot = angle;
+                updateGL();
+            }
+          break;
+        case 2://zRot
+
+            if (side) angle = zRot + 1; else angle = zRot - 1;
+
+            qNormalizeAngle(angle);
+            if (angle != zRot)
+            {
+                zRot = angle;
+                updateGL();
+            }
+          break;
     }
 }
 
-void MyGLWidget::setChooseFigure(int item){
+void MyGLWidget::setChooseFigure(int item)
+{
     itemFigure = item;
     updateGL();
-};
+}
 
-double* MyGLWidget::getCoordinatesParametricFunc(double param[], double v, double u){
+double* MyGLWidget::getCoordinatesParametricFunc(double param[], double v, double u)
+{
     double* xyzReturn = new double[3];
-
-    switch ( itemFigure ) {
+    switch ( itemFigure )
+    {
     case 0: //Ellipsoid
         xyzReturn[0] = param[0] * cos(v) * cos(u);
         xyzReturn[1] = param[2] * cos(v) * sin(u);
@@ -241,60 +294,53 @@ double* MyGLWidget::getCoordinatesParametricFunc(double param[], double v, doubl
         xyzReturn[2] = (param[0] * (cos(v) + log(tan(v / 2))) + param[1] * u) * 1/5;
       break;
     default:
-
       break;
     }
-
     return (xyzReturn);
 }
 
-void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[]){
+void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[])
+{
     double *xyzFun = new double[3];
-
-    if (showVer){
+    if (showVer)
+    {
         double stepVer = fabs(vGap[0] - vGap[1]) / (vCount);
-
-        for (double u = uGap[0]; u <= uGap[1]; u+=stepVer){ //кол-во колец Вертикаль
+        for (double u = uGap[0]; u <= uGap[1]; u+=stepVer)//кол-во колец Вертикаль
+        {
             glBegin(GL_LINE_STRIP);
-            for(double v = vGap[0]; v <= vGap[1]; v+=0.01) //расстояние между точками
+            for(double v = vGap[0]; v <= vGap[1]; v+=0.01)//расстояние между точками
             {
-              xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+                xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
 
-              glVertex3d(xyzFun[0],
-                        xyzFun[1],
-                        xyzFun[2]);
-              delete[] xyzFun;
+                glVertex3d(xyzFun[0], xyzFun[1], xyzFun[2]);
+                delete[] xyzFun;
             }
             glEnd();
         }
     }
 
-    if (showHor){
+    if (showHor)
+    {
         double stepHor = fabs(uGap[0] - uGap[1]) / (hCount + 1);
-
-        for (double v = vGap[0]; v <= vGap[1]; v+=stepHor){ //кол-во колец Горизонталь
+        for (double v = vGap[0]; v <= vGap[1]; v+=stepHor) //кол-во колец Горизонталь
+        {
             glBegin(GL_LINE_STRIP);
             for(double u = uGap[0]; u <= uGap[1]; u+=0.01) //расстояние между точками
             {
-              xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
-
-              glVertex3d(xyzFun[0],
-                        xyzFun[1],
-                        xyzFun[2]);
-              delete[] xyzFun;
+                xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
+                glVertex3d(xyzFun[0], xyzFun[1], xyzFun[2]);
+                delete[] xyzFun;
             }
             glEnd();
         }
     }
-
 }
 
-void MyGLWidget::draw(){
+void MyGLWidget::draw()
+{
     double argsFun[3]={argFun1, argFun2, argFun3};
     double vGap[3]={vFrom, vBefore};
     double uGap[3]={uFrom, uBefore};
-
     glLineWidth(thickLinesPoints);
-
     drowFun(argsFun, uGap, vGap);
 }

@@ -15,7 +15,8 @@ public:
     void setRadius(double r1, double r2, double r3);
     void setUV(double FromU, double BeforeU, double FromV, double BeforeV);
 
-    void setColorWall(int r, int g, int b);
+    QColor colorWall = QColor(95, 169, 169);
+    void setColorWall(QColor color);
     void setThickLinePoint(int thick);
     void setChooseFigure(int item);
 
@@ -26,7 +27,7 @@ public:
 
     void plastScale();
     void minusScale();
-    void rotation(bool side);
+    void rotation(bool side, int asix);
 
 protected:
     void initializeGL();
@@ -39,17 +40,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 
 public slots:
-    // slots for xyz-rotation slider
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
-
-signals:
-    // signaling rotation from mouse movement
-    void xRotationChanged(int angle);
-    void yRotationChanged(int angle);
-    void zRotationChanged(int angle);
-
 
 private:
     void draw();
@@ -59,8 +52,8 @@ private:
     GLfloat xScale = 0.5;
     GLfloat yScale = 0.5;
     GLfloat zScale = 0.5;
-
     GLfloat thickLinesPoints = 1.0;
+    QPoint lastPos;
 
     double argFun1 = 3.0;
     double argFun2 = 3.0;
@@ -77,13 +70,9 @@ private:
 
     bool showHor = true;
     bool showVer = true;
-
     int vCount = 10;
     int hCount = 20;
-
     int itemFigure=0;
-
-    QPoint lastPos;
 };
 
 #endif // MYGLWIDGET_H
