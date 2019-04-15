@@ -88,7 +88,7 @@ void MyGLWidget::paintGL()
     glRotatef(yRot / 1.0f, 0.0f, 1.0f, 0.0f);
     glRotatef(zRot / 1.0f, 0.0f, 0.0f, 1.0f);
     glScalef(xScale, yScale, zScale);
-    draw();
+    drowFun();
 }
 
 void MyGLWidget::resizeGL(int width, int height)
@@ -279,6 +279,7 @@ void MyGLWidget::getCoordinatesParametricFunc(double v, double u, double &x, dou
 
 void MyGLWidget::drowFun()
 {
+    glLineWidth(thickLinesPoints);
     double stepPoints = 0.1;
     if (showVer)
     {
@@ -311,10 +312,4 @@ void MyGLWidget::drowFun()
             glEnd();
         }
     }
-}
-
-void MyGLWidget::draw()
-{
-    glLineWidth(thickLinesPoints);
-    drowFun();
 }

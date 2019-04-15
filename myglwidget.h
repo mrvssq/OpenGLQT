@@ -45,7 +45,6 @@ public slots:
     void setZRotation(int angle);
 
 private:
-    void draw();
     void getCoordinatesParametricFunc(double v, double u, double &x, double &y, double &z);
     void drowFun();
 
