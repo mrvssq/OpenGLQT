@@ -68,12 +68,10 @@ void MyGLWidget::setZRotation(int angle)
 void MyGLWidget::initializeGL()
 {
     qglClearColor(QColor(95, 169, 169));
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
     glDisable(GL_LINE_STIPPLE);
-
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
@@ -204,41 +202,23 @@ void MyGLWidget::minusScale()
 
 void MyGLWidget::rotation(bool side, int asix)
 {
-    int angle;
-    switch (asix)
+    int *asixChange = new int(1);
+    int angle = 0;
+
+    if (asix == 0)
+        asixChange = &xRot;
+    if (asix == 1)
+        asixChange = &yRot;
+    if (asix == 2)
+        asixChange = &zRot;
+
+    if (side) angle = *asixChange + 1; else angle = *asixChange - 1;
+
+    qNormalizeAngle(angle);
+    if (angle != *asixChange)
     {
-        case 0://xRot
-            if (side) angle = xRot + 1; else angle = xRot - 1;
-
-            qNormalizeAngle(angle);
-            if (angle != xRot)
-            {
-                xRot = angle;
-                updateGL();
-            }
-          break;
-        case 1://yRot
-
-            if (side) angle = yRot + 1; else angle = yRot - 1;
-
-            qNormalizeAngle(angle);
-            if (angle != yRot)
-            {
-                yRot = angle;
-                updateGL();
-            }
-          break;
-        case 2://zRot
-
-            if (side) angle = zRot + 1; else angle = zRot - 1;
-
-            qNormalizeAngle(angle);
-            if (angle != zRot)
-            {
-                zRot = angle;
-                updateGL();
-            }
-          break;
+        *asixChange = angle;
+        updateGL();
     }
 }
 
@@ -248,72 +228,69 @@ void MyGLWidget::setChooseFigure(int item)
     updateGL();
 }
 
-double* MyGLWidget::getCoordinatesParametricFunc(double param[], double v, double u)
+void MyGLWidget::getCoordinatesParametricFunc(double v, double u, double &x, double &y, double &z)
 {
-    double* xyzReturn = new double[3];
     switch ( itemFigure )
     {
     case 0: //Ellipsoid
-        xyzReturn[0] = param[0] * cos(v) * cos(u);
-        xyzReturn[1] = param[2] * cos(v) * sin(u);
-        xyzReturn[2] = param[1] * sin(v);
+        x = argFun1 * cos(v) * cos(u);
+        y = argFun3 * cos(v) * sin(u);
+        z = argFun2 * sin(v);
       break;
     case 1://Thor
-        xyzReturn[0] = (param[0] + param[1] * cos(v)) * cos(u);
-        xyzReturn[1] = (param[0] + param[1] * cos(v)) * sin(u);
-        xyzReturn[2] = param[1] * sin(v);
+        x = (argFun1 + argFun2 * cos(v)) * cos(u);
+        y = (argFun1 + argFun2 * cos(v)) * sin(u);
+        z = argFun2 * sin(v);
       break;
     case 2://Hyperboloid
-        xyzReturn[0] = param[0] * cosh(v) * cos(u);
-        xyzReturn[1] = param[1] * cosh(v) * sin(u);
-        xyzReturn[2] = param[2] * sinh(v);
+        x = argFun1 * cosh(v) * cos(u);
+        y = argFun2 * cosh(v) * sin(u);
+        z = argFun3 * sinh(v);
       break;
     case 3://Elliptical paraboloid
-        xyzReturn[0] = param[0] * u;
-        xyzReturn[1] = param[1] * v;
-        xyzReturn[2] = (u* u + v * v);
+        x = argFun1 * u;
+        y = argFun2 * v;
+        z = (u* u + v * v);
       break;
     case 4://Logarithmic spiral
-        xyzReturn[0] = u * cos(u) * (cos(v) + param[0]) * 1/5;
-        xyzReturn[1] = u * sin(u) * (cos(v) + param[1]) * 1/5;
-        xyzReturn[2] = u * sin(v) * 1/5;
+        x = u * cos(u) * (cos(v) + argFun1) * 1/5;
+        y = u * sin(u) * (cos(v) + argFun2) * 1/5;
+        z = u * sin(v) * 1/5;
       break;
     case 5://Pseudospere
-        xyzReturn[0] = param[0] * sin(u) * cos(v);
-        xyzReturn[1] = param[0] * sin(u) * sin(v);
-        xyzReturn[2] = param[0] * (log(tan(u/2)) + cos(u));
+        x = argFun1 * sin(u) * cos(v);
+        y = argFun1 * sin(u) * sin(v);
+        z = argFun1 * (log(tan(u/2)) + cos(u));
       break;
     case 6://Spiral
-        xyzReturn[0] = cos(u) * (cos(v) + param[0]) * 1/2;
-        xyzReturn[1] = sin(u) * (cos(v) + param[1]) * 1/2;
-        xyzReturn[2] = (sin(v) + u) * 1/2;
+        x = cos(u) * (cos(v) + argFun1) * 1/2;
+        y = sin(u) * (cos(v) + argFun2) * 1/2;
+        z = (sin(v) + u) * 1/2;
       break;
     case 7://Dini's Surfase
-        xyzReturn[0] = param[0] * cos(u) * sin(v) * 1/5;
-        xyzReturn[1] = param[0] * sin(u) * sin(v) * 1/5;
-        xyzReturn[2] = (param[0] * (cos(v) + log(tan(v / 2))) + param[1] * u) * 1/5;
+        x = argFun1 * cos(u) * sin(v) * 1/5;
+        y = argFun1 * sin(u) * sin(v) * 1/5;
+        z = (argFun1 * (cos(v) + log(tan(v / 2))) + argFun2 * u) * 1/5;
       break;
     default:
       break;
     }
-    return (xyzReturn);
 }
 
-void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[])
+void MyGLWidget::drowFun()
 {
-    double *xyzFun = new double[3];
+    double stepPoints = 0.1;
     if (showVer)
     {
-        double stepVer = fabs(vGap[0] - vGap[1]) / (vCount);
-        for (double u = uGap[0]; u <= uGap[1]; u+=stepVer)//кол-во колец Вертикаль
+        double stepVer = fabs(vFrom - vBefore) / (vCount);
+        for (double u = uFrom; u <= uBefore; u+=stepVer)//кол-во колец Вертикаль
         {
             glBegin(GL_LINE_STRIP);
-            for(double v = vGap[0]; v <= vGap[1]; v+=0.01)//расстояние между точками
+            for(double v = vFrom; v <= vBefore + stepPoints; v+=stepPoints)//расстояние между точками
             {
-                xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
-
-                glVertex3d(xyzFun[0], xyzFun[1], xyzFun[2]);
-                delete[] xyzFun;
+                double x=0, y=0, z=0;
+                getCoordinatesParametricFunc(v, u, x, y, z);
+                glVertex3d(x, y, z);
             }
             glEnd();
         }
@@ -321,15 +298,15 @@ void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[])
 
     if (showHor)
     {
-        double stepHor = fabs(uGap[0] - uGap[1]) / (hCount + 1);
-        for (double v = vGap[0]; v <= vGap[1]; v+=stepHor) //кол-во колец Горизонталь
+        double stepHor = fabs(uFrom - uBefore) / (hCount + 1);
+        for (double v = vFrom; v <= vBefore; v+=stepHor) //кол-во колец Горизонталь
         {
             glBegin(GL_LINE_STRIP);
-            for(double u = uGap[0]; u <= uGap[1]; u+=0.01) //расстояние между точками
+            for(double u = uFrom; u <= uBefore + stepPoints; u+=stepPoints) //расстояние между точками
             {
-                xyzFun = getCoordinatesParametricFunc(argsFun, v, u);
-                glVertex3d(xyzFun[0], xyzFun[1], xyzFun[2]);
-                delete[] xyzFun;
+                double x=0, y=0, z=0;
+                getCoordinatesParametricFunc(v, u, x, y, z);
+                glVertex3d(x, y, z);
             }
             glEnd();
         }
@@ -338,9 +315,6 @@ void MyGLWidget::drowFun(double argsFun[], double uGap[], double vGap[])
 
 void MyGLWidget::draw()
 {
-    double argsFun[3]={argFun1, argFun2, argFun3};
-    double vGap[3]={vFrom, vBefore};
-    double uGap[3]={uFrom, uBefore};
     glLineWidth(thickLinesPoints);
-    drowFun(argsFun, uGap, vGap);
+    drowFun();
 }

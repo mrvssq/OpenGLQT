@@ -46,8 +46,8 @@ public slots:
 
 private:
     void draw();
-    double* getCoordinatesParametricFunc(double param[], double v, double u);
-    void drowFun(double argsFun[], double uGap[], double vGap[]);
+    void getCoordinatesParametricFunc(double v, double u, double &x, double &y, double &z);
+    void drowFun();
 
     GLfloat xScale = 0.5;
     GLfloat yScale = 0.5;

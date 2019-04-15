@@ -89,20 +89,23 @@ void Window::ButtonSetRadius()
     double c = ui->lineEditRadius3->text().toDouble();
     ui->myGLWidget->setRadius(a, b, c);
 
-    ui->myGLWidget->setUV(ui->lineEditFromU->text().toDouble(),
-                          ui->lineEditBeforeU->text().toDouble(),
-                          ui->lineEditFromV->text().toDouble(),
-                          ui->lineEditBeforeV->text().toDouble());
+    double fromU = ui->lineEditFromU->text().toDouble();
+    double beforeU = ui->lineEditBeforeU->text().toDouble();
+    double fromV = ui->lineEditFromV->text().toDouble();
+    double beforeV = ui->lineEditBeforeV->text().toDouble();
+    ui->myGLWidget->setUV(fromU, beforeU, fromV, beforeV);
+
     ui->horizontalSliderParam1->setValue(static_cast<int>(a * 100.0));
     ui->horizontalSliderParam2->setValue(static_cast<int>(b * 100.0));
     ui->horizontalSliderParam3->setValue(static_cast<int>(c * 100.0));
 
-    int count = ui->lineEditCountV->text().toInt();
-    if (count >= 0)
-        ui->myGLWidget->setCountVer(count);
-    count = ui->lineEditCountH->text().toInt();
-    if (count >= 0)
-        ui->myGLWidget->setCountHor(count);
+    int countVer = ui->lineEditCountV->text().toInt();
+    if (countVer >= 0)
+        ui->myGLWidget->setCountVer(countVer);
+
+    int countHor = ui->lineEditCountH->text().toInt();
+    if (countHor >= 0)
+        ui->myGLWidget->setCountHor(countHor);
 }
 
 void Window::setShowHor(bool show)
